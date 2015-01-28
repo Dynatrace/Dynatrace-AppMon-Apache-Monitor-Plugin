@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.2"?>
+<plugin>
+  <extension point="com.dynatrace.diagnostics.pdk.pluginconfig" id="com.mcg.diagnostics.plugins.ApacheMonitor" name="Apache Status Monitor">
+    <information>
+      <description value="Monitors the Apache server status page and parses out the results into the repository." />
+      <category value="Remote" />
+      <supportlevel value="unsupported" />
+    </information>
+    <configuration>
+      <property key="protocol" label="Protocol" type="list" description="Select the protocol that will be used to establish the connection. If 'https://' is selected, a secure connection will be made using SSL." default="http://">
+        <list>
+          <item value="http://" />
+          <item value="https://" />
+        </list>
+      </property>
+      <property key="httpPort" label="Port" type="long" description="Enter the port number of the webserver. The default HTTP port is 80." default="80">
+        <visibility>
+          <rule key="protocol" value="http://" />
+        </visibility>
+      </property>
+      <property key="httpsPort" label="Port" type="long" description="Enter the port number of the webserver. The default port for HTTP over SSL is 443." default="443">
+        <visibility>
+          <rule key="protocol" value="https://" />
+        </visibility>
+      </property>
+      <property key="path" label="Path" type="string" description="Enter the path to the webpage to be monitored. Example: /index.html" default="/server-status?auto" multiline="false" />
+      <property key="method" label="Method" type="list" description="Specify the type of the HTTP request. GET: retrieve the page content, HEAD: retrieve HTTP headers only, POST: send data with the request and retrive the page content (e.g. used for HTML forms)" default="GET">
+        <list>
+          <item value="GET" />
+          <item value="HEAD" />
+          <item value="POST" />
+        </list>
+      </property>
+      <property key="postData" label="POST Data" type="string" description="The data which will be sent with the POST request." default="" multiline="false">
+        <visibility>
+          <rule key="method" value="POST" />
+        </visibility>
+      </property>
+      <property key="httpVersion" label="HTTP version" type="list" description="The version of the HTTP protocol. HTTP/1.1 is the recommended." default="1.1">
+        <list>
+          <item value="1.1" />
+          <item value="1.0" />
+        </list>
+      </property>
+      <property key="userAgent" label="User-Agent" type="string" description="The user agent string identifies the HTTP client and is sent with every request." default="dynaTrace/3.0" multiline="false" />
+      <property key="maxRedirects" label="Max. redirects" type="long" description="If a value of 1 or greater is specified, the URL Monitor will follow HTTP redirect codes (301-303, 307) to retrieve the webpage." default="3" />
+      <property key="serverAuth" label="Server authorization" type="boolean" description="If the URL specified requires a name and password for access, server authorization needs to be enabled." default="false" />
+      <property key="serverUsername" label="Server username" type="string" description="The username that is used for authorization with the server." default="" multiline="false">
+        <visibility>
+          <rule key="serverAuth" value="true" />
+        </visibility>
+      </property>
+      <property key="serverPassword" label="Server password" type="password" description="The password for the username." default="">
+        <visibility>
+          <rule key="serverAuth" value="true" />
+        </visibility>
+      </property>
+      <property key="useProxy" label="Proxy" type="boolean" description="If enabled, the configured HTTP proxy server will be used to access the URL." default="false" />
+      <property key="proxyHost" label="Proxy host" type="string" description="The hostname of the HTTP proxy server." default="" multiline="false">
+        <visibility>
+          <rule key="useProxy" value="true" />
+        </visibility>
+      </property>
+      <property key="proxyPort" label="Proxy port" type="long" description="The port of the HTTP proxy server." default="8080">
+        <visibility>
+          <rule key="useProxy" value="true" />
+        </visibility>
+      </property>
+      <property key="proxyAuth" label="Proxy authorization" type="boolean" description="If the HTTP proxy server requires a username and a password for access, proxy authorization needs to be enabled." default="false">
+        <visibility>
+          <rule key="useProxy" value="true" />
+        </visibility>
+      </property>
+      <property key="proxyUsername" label="Proxy username" type="string" description="The username that is used for authorization with the HTTP proxy server." default="" multiline="false">
+        <visibility>
+          <rule key="proxyAuth" value="true" />
+        </visibility>
+      </property>
+      <property key="proxyPassword" label="Proxy password" type="password" description="The password for the proxy username." default="">
+        <visibility>
+          <rule key="proxyAuth" value="true" />
+        </visibility>
+      </property>
+    </configuration>
+  </extension>
+  <extension point="com.dynatrace.diagnostics.pdk.monitor" id="com.mcg.diagnostics.plugins.ApacheMonitor.monitor" name="Apache Monitor">
+    <plugin configid="com.mcg.diagnostics.plugins.ApacheMonitor" class="com.mcg.Apache.ApacheMonitor" />
+  </extension>
+  <extension point="com.dynatrace.diagnostics.pdk.monitormetricgroup" id="com.mcg.diagnostics.plugins.ApacheMonitor.metricgroup1" name="Apache Monitor">
+    <metricgroup monitorid="com.mcg.diagnostics.plugins.ApacheMonitor.monitor">
+      <metric name="TotalAccesses" unit="count" description="Total count of requests to the Apache server." />
+      <metric name="TotalBytes" unit="megabytes" description="Total amount of megabytes served by the Apache server." />
+      <metric name="CPULoad" unit="percent" description="Current CPU load of the Apache server." />
+      <metric name="Uptime" unit="s" description="The time the servers has been running in seconds." />
+      <metric name="ReqPerSec" unit="count" description="Requests received per second." />
+      <metric name="BytesPerSec" unit="kilobytes" description="Bytes sent per second." />
+      <metric name="BytesPerReq" unit="kilobytes" description="Bytes sent per request." />
+      <metric name="BusyWorkers" unit="count" description="The number of worker serving requests." />
+      <metric name="IdleWorkers" unit="count" description="The number of idle worker." />
+      <metric defaultrate="purepath" name="WorkersUtilization" unit="percent" description="Shows how utilized the server is, consider increasing the workers thread pool if this reaches 100%.&#xD;&#xA;No more connections is accepted by Apache when it reaches 100%." />
+    </metricgroup>
+  </extension>
+  <extension point="com.dynatrace.diagnostics.pdk.monitormetricgroup" id="com.mcg.diagnostics.plugins.ApacheMonitor.metricgroup2" name="Apache Scoreboard">
+    <metricgroup monitorid="com.mcg.diagnostics.plugins.ApacheMonitor.monitor">
+      <metric defaultrate="purepath" name="Waiting for Connection" unit="number" description="Waiting for Connection" />
+      <metric defaultrate="purepath" name="Starting up" unit="number" description="Starting up" />
+      <metric defaultrate="purepath" name="Reading Request" unit="number" description="Reading Request" />
+      <metric defaultrate="purepath" name="Sending Reply" unit="number" description="Sending Reply" />
+      <metric defaultrate="purepath" name="Keepalive (read)" unit="number" description="Keepalive (read)" />
+      <metric defaultrate="purepath" name="DNS Lookup" unit="number" description="DNS Lookup" />
+      <metric defaultrate="purepath" name="Closing connection" unit="number" description="Closing connection" />
+      <metric defaultrate="purepath" name="Logging" unit="number" description="Logging" />
+      <metric defaultrate="purepath" name="Gracefully finishing" unit="number" description="Gracefully finishing" />
+      <metric defaultrate="purepath" name="Idle cleanup of worker" unit="number" description="Idle cleanup of worker" />
+      <metric defaultrate="purepath" name="Open slot with no current process" unit="number" description="Open slot with no current process" />
+    </metricgroup>
+  </extension>
+</plugin>
+

@@ -1,0 +1,12 @@
+Manifest-Version: 1.0
+Require-Bundle: com.dynatrace.diagnostics.sdk
+Bundle-Vendor: MCG Systems
+Bundle-ClassPath: .,lib/commons-httpclient-3.1.jar,lib/org.apache.comm
+ ons.codec_1.3.0.v20080530-1600.jar,lib/org.apache.commons.logging_1.0
+ .4.v20080605-1930.jar
+Bundle-Version: 5.5.0.5226
+Bundle-Name: ApacheMonitor
+Bundle-ManifestVersion: 2
+Bundle-SymbolicName: com.mcg.diagnostics.plugins.ApacheMonitor;singlet
+ on:=true
+
