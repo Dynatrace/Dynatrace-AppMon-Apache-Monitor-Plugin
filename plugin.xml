@@ -24,6 +24,8 @@
           <rule key="protocol" value="https://" />
         </visibility>
       </property>
+      <property key="connectionTimeout" label="ConnectionTimeout" type="long" description="timeout until a connection is etablished" default="5000" />
+      <property key="readTimeout" label="ReadTimeout" type="long" description="timeout for waiting for data" default="5000" />
       <property key="path" label="Path" type="string" description="Enter the path to the webpage to be monitored. Example: /index.html" default="/server-status?auto" multiline="false" />
       <property key="method" label="Method" type="list" description="Specify the type of the HTTP request. GET: retrieve the page content, HEAD: retrieve HTTP headers only, POST: send data with the request and retrive the page content (e.g. used for HTML forms)" default="GET">
         <list>

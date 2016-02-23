@@ -19,6 +19,7 @@ import org.apache.commons.httpclient.methods.HeadMethod;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.methods.StringRequestEntity;
 import org.apache.commons.httpclient.params.HttpClientParams;
+import org.apache.commons.httpclient.params.HttpConnectionManagerParams;
 import org.apache.commons.httpclient.params.HttpMethodParams;
 import org.apache.commons.httpclient.protocol.Protocol;
 import org.apache.commons.httpclient.util.EncodingUtil;
@@ -38,6 +39,9 @@ public class ApacheMonitor implements Monitor {
 	private static final String CONFIG_HTTP_VERSION = "httpVersion";
 	private static final String CONFIG_DT_TAGGING = "dtTagging";
 	private static final String CONFIG_MAX_REDIRECTS = "maxRedirects";
+	
+	private static final String CONFIG_CONNECTION_TIMEOUT = "connectionTimeout";
+	private static final String CONFIG_READ_TIMEOUT = "readTimeout";
 
 	private static final String CONFIG_SERVER_AUTH = "serverAuth";
 	private static final String CONFIG_SERVER_USERNAME = "serverUsername";
@@ -116,7 +120,16 @@ public class ApacheMonitor implements Monitor {
 		System.setProperty("javax.net.ssl.trustStore", "c:/jssecacerts");
 		System.setProperty("javax.net.ssl.trustStorePassword", "changeit");
 		*/
-		httpClient = new HttpClient(new SimpleHttpConnectionManager());
+		
+		SimpleHttpConnectionManager simplehttpconnectionmanager = new SimpleHttpConnectionManager();
+		HttpConnectionManagerParams params = new HttpConnectionManagerParams();
+		// set a timeout until a connection is etablished
+		params.setConnectionTimeout(env.getConfigLong(CONFIG_CONNECTION_TIMEOUT).intValue());
+		// set a timeout for waiting for data
+		params.setSoTimeout(env.getConfigLong(CONFIG_READ_TIMEOUT).intValue());
+		simplehttpconnectionmanager.setParams(params);
+		httpClient = new HttpClient(simplehttpconnectionmanager);
+		
 		config = readConfig(env);
 		try {
 			env.getHost().getAddress(); // check if host is set
